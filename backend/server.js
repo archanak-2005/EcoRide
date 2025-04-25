@@ -1,19 +1,38 @@
-const express = require("express");
+const express = require('express');
+const mongoose = require('mongoose');
+const app = express();
+const bodyparser = require('body-parser');
+const cookieparser = require('cookie-parser');
+const cors = require("cors");
 const dotenv = require("dotenv");
-const connectDB = require("./config/db");
-const userRoutes = require("./routes/LoginReister"); // Import routes
 
 dotenv.config();
-connectDB();
 
-const app = express();
+// Importing Routes
+const authRoutes = require("./Routes/authentication");
+const allusersRoutes = require("./Routes/allusersRoutes");
+const tripRoutes = require("./Routes/tripRoutes");
 
-app.use(express.json()); // Middleware to parse JSON
+const PORT=5000;
+
+// MongoDB Connection
+mongoose.connect("mongodb+srv://archanakrishnakumar674:pEai9Eu6RSNEdOyI@cluster0.k8xhifk.mongodb.net/")
+    .then(() => console.log("DB connected"))
+    .catch(error => console.error(error));
+
+// Middleware
+app.use(bodyparser.json());
+app.use(cookieparser());
+app.use(cors());
 
 // Routes
+app.use("/api", authRoutes);
+// app.use("/api3", allusersRoutes);
+// app.use("/api4", tripRoutes);
 
+// Starting the server
+app.listen(PORT, () => {
+    console.log(`Listening on a port ${PORT}`);
+});
 
-app.use("/api/users", userRoutes); // Mount user routes
-
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+module.exports = app;
